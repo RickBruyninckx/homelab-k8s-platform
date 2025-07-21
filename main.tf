@@ -19,7 +19,7 @@ module "proxmox_talos" {
   #             - siderolabs/qemu-guest-agent
   #             - siderolabs/util-linux-tools
   talos_disk_image_schematic_id = "88d1f7a5c4f1d3aba7df787c448c1d3d008ed29cfb34af53fa0df4336a56040b"
-  talos_version = "v1.9.5"
+  talos_version = "v1.10.5"
 
   talos_cluster_name = "k8s-dev"
 }

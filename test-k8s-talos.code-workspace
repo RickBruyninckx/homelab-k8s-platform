@@ -1,0 +1,54 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		// {
+		//   "label": "Label that appears in the taskbar",
+		//   "alignment": "The alignment of the button in the taskbar. Options: left and right. Default: left",
+		//   "task": "The vscode task to execute. Must be absent when using 'tasks'",
+		//   "tasks": "List of tasks to show in the Quick Pick Menu",
+		//   "tooltip": "Optional tooltip to show when hovering over the button (defaults to task name)",
+		//   "description": "A description of the task when viewing the task list in the Quick Pick Menu",
+		//   "color": "Optional color for the button. Options: default, error (red), warning (yellow). Default: default"
+		// }
+
+		"VsCodeTaskButtons.showCounter": false,
+		"VsCodeTaskButtons.tasks": [
+			{
+			"label": "$(zap) Init",
+			"task": "Tofu Init",
+			"tooltip": "🔨 Initializes terraform on host pc"
+			},
+			{
+			"label": "$(cloud-upload) Apply",
+			"task": "Tofu Apply (Build)",
+			"tooltip": "Deploy terraform config to target host",
+			"color": "warning"
+			},
+			{
+			"label": "$(server-process) Other",
+			"tasks": [
+				//PLAN
+				{
+				"label": "🗺️ Plan",
+				"task": "clean",
+				"description": "$(list-ordered) list out the changes to be made"
+				},
+				{
+				"label": "🧪 Debug",
+				"task": "Tofu Apply with Logging",
+				"description": "$(cloud-upload) Apply the terraform config with logging enabled"
+				},
+				{
+				"label": "💀 Destroy",
+				"task": "Tofu Destroy",
+				"description": "$(trash) Remove all deployed resources"
+				}
+			]
+			}
+		]
+	}
+}

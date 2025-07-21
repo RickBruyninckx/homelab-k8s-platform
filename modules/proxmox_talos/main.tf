@@ -3,12 +3,12 @@ terraform {
     proxmox = {
       # https://registry.terraform.io/providers/bpg/proxmox/latest/docs
       source = "bpg/proxmox"
-      version = "0.74.1"
+      version = ">= 0.80.0"
     }
     talos = {
       # https://registry.terraform.io/providers/siderolabs/talos/latest/docs
       source = "siderolabs/talos"
-      version = "0.7.1"
+      version = ">= 0.7.1"
     }
   }
 }
@@ -80,12 +80,12 @@ resource "proxmox_virtual_environment_vm" "talos" {
     bridge = "vmbr0"
   }
   efi_disk {
-    datastore_id = "local-lvm"
+    datastore_id = "local-zfs"
     file_format  = "raw"
     type         = "4m"
   }
   disk {
-    datastore_id = "local-lvm"
+    datastore_id = "local-zfs"
     interface    = "scsi0"
     iothread     = true
     ssd          = true
@@ -99,6 +99,7 @@ resource "proxmox_virtual_environment_vm" "talos" {
     trim    = true
   }
   initialization {
+    datastore_id = "local-zfs"
     ip_config {
       ipv4 {
         address = each.value.ip

@@ -1,0 +1,38 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "Tofu Init",
+			"command": "tofu init --upgrade",
+			"group": "build"
+		},
+		{
+			"type": "shell",
+			"label": "Tofu Plan (Test)",
+			"command": "tofu plan",
+			"group": "test"
+		},
+		{
+			"type": "shell",
+			"label": "Tofu Apply (Build)",
+			"command": "tofu apply -auto-approve",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"type": "shell",
+			"label": "Tofu Apply with Logging",
+			"command": "$env:TOFU_LOG=TRACE; $env:TOFU_LOG_PATH='log.txt'; tofu apply -auto-approve",
+			"group": "build"
+		},
+		{
+			"type": "shell",
+			"label": "Tofu Destroy",
+			"command": "tofu destroy -auto-approve",
+			"group": "test"
+		}
+	]
+}
