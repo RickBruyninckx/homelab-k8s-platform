@@ -1,6 +1,9 @@
 variable "proxmox_node_name" {
   type = string
 }
+variable "proxmox_host_ip" {
+  type  = string  
+}
 variable "proxmox_admin_endpoint" {
   type = string
 }

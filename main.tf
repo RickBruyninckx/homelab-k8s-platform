@@ -2,6 +2,7 @@ module "proxmox_talos" {
   source = "./modules/proxmox_talos"
 
   proxmox_node_name = var.proxmox_node_name
+  proxmox_host_ip = var.proxmox_host_ip
   proxmox_admin_endpoint = var.proxmox_admin_endpoint
   proxmox_username = var.proxmox_username
   proxmox_password = var.proxmox_password

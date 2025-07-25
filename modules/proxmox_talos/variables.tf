@@ -1,6 +1,9 @@
 variable "proxmox_node_name" {
   type = string
 }
+variable "proxmox_host_ip" {
+  type  = string  
+}
 variable "proxmox_admin_endpoint" {
   type = string
 }
@@ -16,9 +19,11 @@ variable "proxmox_insecure" {
 }
 variable "proxmox_vms_talos" {
   type = map(object({
-    id     = number
-    ip     = string
-    controller = optional(bool)
+    id          = number
+    ip          = string
+    controller  = optional(bool)
+    proxmox_port = optional(number)
+    node_port   = optional(number)
   }))
 }
 variable "proxmox_vms_default_gateway" {

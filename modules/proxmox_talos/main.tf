@@ -77,7 +77,7 @@ resource "proxmox_virtual_environment_vm" "talos" {
     dedicated = 3 * 1024
   }
   network_device {
-    bridge = "vmbr0"
+    bridge = "medusanet" # Use the NAT-enabled bridge
   }
   efi_disk {
     datastore_id = "local-zfs"
@@ -103,9 +103,18 @@ resource "proxmox_virtual_environment_vm" "talos" {
     ip_config {
       ipv4 {
         address = each.value.ip
-        gateway = var.proxmox_vms_default_gateway
+        gateway = "192.168.100.1" # Gateway for NAT
       }
     }
+  }
+}
+
+resource "null_resource" "nat_setup" {
+  provisioner "local-exec" {
+    command = <<EOT
+      iptables -t nat -A POSTROUTING -s 192.168.100.0/24 -o vmbr0 -j MASQUERADE
+      echo 1 > /proc/sys/net/ipv4/ip_forward
+    EOT
   }
 }
 
@@ -188,4 +197,15 @@ resource "talos_cluster_kubeconfig" "kubeconfig" {
 
   client_configuration = talos_machine_secrets.this.client_configuration
   node                 = local.controller_vm_ips[0]
+}
+
+resource "null_resource" "port_forwarding" {
+  provisioner "local-exec" {
+    command = <<EOT
+      %{ for key, node in var.proxmox_vms_talos }
+      iptables -t nat -A PREROUTING -p tcp -d ${var.proxmox_host_ip} --dport ${node.proxmox_port} -j DNAT --to-destination ${replace(node.ip, "/24", "")}:${node.node_port}
+      iptables -t nat -A POSTROUTING -p tcp -d ${replace(node.ip, "/24", "")} --dport ${node.node_port} -j SNAT --to-source ${var.proxmox_host_ip}
+      %{ endfor }
+    EOT
+  }
 }
