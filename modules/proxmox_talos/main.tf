@@ -50,7 +50,7 @@ resource "proxmox_virtual_environment_download_file" "talos_nocloud_image" {
   file_name               = "talos-${var.talos_version}-nocloud-amd64.iso"
   url                     = "https://factory.talos.dev/image/${var.talos_disk_image_schematic_id}/${var.talos_version}/nocloud-amd64.raw.zst"
   decompression_algorithm = "zst"
-  overwrite               = false
+  overwrite               = true
 }
 
 # https://registry.terraform.io/providers/bpg/proxmox/latest/docs/resources/virtual_environment_vm
@@ -112,8 +112,7 @@ resource "proxmox_virtual_environment_vm" "talos" {
 resource "null_resource" "nat_setup" {
   provisioner "local-exec" {
     command = <<EOT
-      iptables -t nat -A POSTROUTING -s 192.168.100.0/24 -o vmbr0 -j MASQUERADE
-      echo 1 > /proc/sys/net/ipv4/ip_forward
+      sshpass -p "${var.proxmox_password}" ssh root@${var.proxmox_host_ip} "iptables -t nat -A POSTROUTING -s 192.168.100.0/24 -o vmbr0 -j MASQUERADE && echo 1 > /proc/sys/net/ipv4/ip_forward"
     EOT
   }
 }
@@ -202,10 +201,14 @@ resource "talos_cluster_kubeconfig" "kubeconfig" {
 resource "null_resource" "port_forwarding" {
   provisioner "local-exec" {
     command = <<EOT
+      sshpass -p "${var.proxmox_password}" ssh root@${var.proxmox_host_ip} <<EOF
       %{ for key, node in var.proxmox_vms_talos }
-      iptables -t nat -A PREROUTING -p tcp -d ${var.proxmox_host_ip} --dport ${node.proxmox_port} -j DNAT --to-destination ${replace(node.ip, "/24", "")}:${node.node_port}
-      iptables -t nat -A POSTROUTING -p tcp -d ${replace(node.ip, "/24", "")} --dport ${node.node_port} -j SNAT --to-source ${var.proxmox_host_ip}
+      if [ -n "${node.proxmox_port}" ] && [ -n "${node.node_port}" ]; then
+        iptables -t nat -A PREROUTING -p tcp -d ${var.proxmox_host_ip} --dport ${node.proxmox_port} -j DNAT --to-destination ${replace(node.ip, "/24", "")}:${node.node_port}
+        iptables -t nat -A POSTROUTING -p tcp -d ${replace(node.ip, "/24", "")} --dport ${node.node_port} -j SNAT --to-source ${var.proxmox_host_ip}
+      fi
       %{ endfor }
+      EOF
     EOT
   }
 }
