@@ -25,7 +25,7 @@
 		{
 			"type": "shell",
 			"label": "Tofu Apply with Logging",
-			"command": "$env:TOFU_LOG=TRACE; $env:TOFU_LOG_PATH='log.txt'; tofu apply -auto-approve",
+			"command": "$env:TF_LOG = 'trace'; $env:TF_LOG_PATH = './terraform.log'; tofu apply -auto-approve",
 			"group": "build"
 		},
 		{
